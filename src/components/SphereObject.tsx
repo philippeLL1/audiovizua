@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Mesh } from 'three'
-import {useTexture, OrbitControls} from '@react-three/drei'
+import {useTexture, OrbitControls, Environment} from '@react-three/drei'
 import React from "react";
 
 const SPHERE_RADIUS: number = 2.5
@@ -12,19 +12,35 @@ interface AudioInfo {
 
 export default function Scene(props: AudioInfo) {
     return <div style={{width: "100vw", height: "100vh"}}>
-    <Canvas>
-        <ambientLight intensity={0.4} />
-        <directionalLight color="white" position={[0, 0, 5]} />
+    <Canvas camera={{position: [0, 40, 0], rotation: [0, -60, 0]}}>
+        <ambientLight intensity={3.0} />
+        <directionalLight color="white" position={[0, 0, 5]} intensity={2.0} />
         <SphereMesh freqArray={props.freqArray} analyser={props.analyser}></SphereMesh>
         <OrbitControls></OrbitControls>
+        <Environment
+            files='environments/NorwayForest.hdr'
+            ground={{
+                height: 30,
+                radius: 60,
+                scale: 100,
+            }}>
+        </Environment>
     </Canvas>
     </div>
 }
 
 function SphereMaterial() {
-    const colorMap = useTexture('icons8-mandala.svg')
+    const props = useTexture({
+        map: 'woodSphere/BaseColor.jpg',
+        normalMap: 'woodSphere/Normal.jpg',
+        roughnessMap: 'woodSphere/Roughness.jpg',
+        displacementMap: 'woodSphere/Height.jpg',
+        aoMap: 'woodSphere/AmbientOcclusion.jpg',
+    })
     return <>
-        <meshStandardMaterial map={colorMap} />
+        <meshStandardMaterial
+            displacementScale={0.2}
+            {...props} />
     </>
 }
 
@@ -61,7 +77,7 @@ function SphereMesh({ freqArray, analyser }: AudioInfo) {
     })
 
      return <>
-         <mesh ref={sphere}>
+         <mesh ref={sphere} position={[0, 10, 0]}>
             <SphereGeometry></SphereGeometry>
             <SphereMaterial></SphereMaterial>
          </mesh>

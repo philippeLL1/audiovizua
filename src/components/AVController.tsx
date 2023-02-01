@@ -1,5 +1,7 @@
 import React from 'react'
 import Scene from "@/components/SphereObject";
+import {Environment, OrbitControls, PerspectiveCamera} from "@react-three/drei";
+import {Canvas} from "@react-three/fiber";
 
 interface FileInfo {
     file?: File
@@ -74,7 +76,18 @@ export default function AVController() {
         if (playing) {
             return <><Scene analyser={file?.audioAnalyzer!} freqArray={file?.audioArray!}></Scene></>
         }
-        return <></>
+        return (
+        <div style={{width: "100vw", height: "100vh"}}>
+            <Canvas camera={{position: [0, 40, 0]}}>
+                <ambientLight intensity={3.0} />
+                <directionalLight color="white" position={[0, 0, 5]} intensity={2.0} />
+                <OrbitControls></OrbitControls>
+                <Environment
+                    files='environments/NorwayForest.hdr'
+                    background>
+                </Environment>
+        </Canvas>
+        </div>)
 
     }
 
